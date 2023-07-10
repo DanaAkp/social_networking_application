@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 message_router = APIRouter(
     prefix="/messages",
-    tags=["users"],
+    tags=["messages"],
     # dependencies=[Depends(get_token_header)],
     responses={404: {"description": "Not found"}},
 )

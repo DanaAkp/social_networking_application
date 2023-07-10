@@ -4,11 +4,10 @@ from constants import len_of_full_user_name, len_of_user_name, min_len_of_passwo
 
 
 class UserDataIn(BaseModel):
-    name: str = Field(lt=len_of_user_name)
-    full_name: str = Field(lt=len_of_full_user_name)
+    name: str = Field(max_length=len_of_user_name)
+    full_name: str = Field(max_length=len_of_full_user_name)
     email: str
-    login: str
-    password: str = Field(gt=min_len_of_password)
+    password: str = Field(min_length=min_len_of_password)
 
     @validator("email")
     def check_email(cls, v):
@@ -30,4 +29,3 @@ class UserData(BaseModel):
     name: str
     full_name: str
     email: str
-    login: str
