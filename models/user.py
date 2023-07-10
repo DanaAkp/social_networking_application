@@ -11,9 +11,8 @@ users = db.Table(
     db.Column('name', db.String),
     db.Column('full_name', db.String),
     db.Column('email', db.String),
-    db.Column('login', db.String),
     db.Column('password', db.String),
     db.Column('role_id', db.UUID(as_uuid=True), db.ForeignKey(roles.c.id)),
-    db.UniqueConstraint('login'),
     db.UniqueConstraint('email'),
+
 )

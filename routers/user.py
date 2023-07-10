@@ -16,12 +16,6 @@ user_router = APIRouter(
         404: {'description': 'Not found'},
     }
 )
-async def update_item(item_id: str):
-    if item_id != "plumbus":
-        raise HTTPException(
-            status_code=403, detail="You can only update the item: plumbus"
-        )
-    return {"item_id": item_id, "name": "The great Plumbus"}
 
 
 @user_router.post(
@@ -34,7 +28,28 @@ async def update_item(item_id: str):
     })
 async def user_registration(user_data: UserDataIn):
     res = await service.registration(
-        login=user_data.login, password=user_data.password, name=user_data.name, full_name=user_data.full_name,
+        password=user_data.password, name=user_data.name, full_name=user_data.full_name,
         email=user_data.email
+    )
+    return res
+
+
+@user_router.get("/{user_id}", response_model=UserData)
+async def get_user_by_id(user_id: str):
+    res = await service.get_item_by_id(user_id)
+    return res
+
+
+@user_router.get("", response_model=List[UserData])
+async def search_user_by_name(user_name: str):
+    res = await service.get_item_by_name(user_name)
+    return res
+
+
+@user_router.put("/{user_id}", response_model=UserData)
+async def update_user(user_id: str, user_data: UserDataIn):
+    res = await service.edit_user(
+        password=user_data.password, name=user_data.name, full_name=user_data.full_name,
+        email=user_data.email, user_id=user_id
     )
     return res
