@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 
 from routers.user import user_router
-from routers.message import message_router
+from routers.post import posts_router
+from routers.admin import admin_router
 from models import metadata, engine, connection
 
 app = FastAPI(title="SocialNetworkingApp")
@@ -14,4 +15,4 @@ async def shutdown():
 
 
 app.include_router(user_router)
-app.include_router(message_router)
+app.include_router(posts_router)
