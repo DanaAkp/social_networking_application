@@ -1,29 +1,29 @@
 import uuid
 
 import sqlalchemy as db
-from sqlalchemy import Table
 from sqlalchemy.orm import relationship
 
 from models import metadata, Base
-from models.user import users
 
+posts_users = db.Table(
+    "posts_users",
+    metadata,
+    db.Column("user_id", db.ForeignKey("users.id"), primary_key=True),
+    db.Column("post_id", db.ForeignKey("posts.id"), primary_key=True),
+    db.Column("like", db.Boolean),
+    db.Column("dislike", db.Boolean),
+)
 
-# association_table = db.Table(
-#     "post_users",
-#     Base.metadata,
-#     db.Column("left_id", db.ForeignKey("left_table.id"), primary_key=True),
-#     db.Column("right_id", db.ForeignKey("right_table.id"), primary_key=True),
-# )
 
 class Post(Base):
     __tablename__ = 'posts'
     metadata = metadata
     id = db.Column(db.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    text_post = db.Column(db.String, nullable=False)
-    owner_id = db.Column(db.UUID(as_uuid=True), db.ForeignKey(users.c.id), nullable=False)
-    date_dispatch = db.Column(db.Date, nullable=False)
-    time_dispatch = db.Column(db.Time, nullable=False)
+    title = db.Column(db.String, nullable=False)
+    body = db.Column(db.String, nullable=False)
+    owner_id = db.Column(db.UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
+    create_time = db.Column(db.DateTime, nullable=False)
+    modify_time = db.Column(db.DateTime)
 
     # relationships
-    # likes = relationship(back_populates='post')
-    # dislikes = relationship(back_populates='post')
+    users = relationship('User', secondary=posts_users, back_populates='posts')

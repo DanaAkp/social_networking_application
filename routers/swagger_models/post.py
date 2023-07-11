@@ -1,23 +1,31 @@
 import datetime
 import uuid
+from typing import List
 
 from routers.swagger_models import DataBaseModel
 
 
 class PostsDataIn(DataBaseModel):
-    owner_id: uuid.UUID
-    text_message: str
+    title: str
+    body: str
 
 
 class RatePostsDataIn(DataBaseModel):
-    owner_id: uuid.UUID
+    like: bool
+    dislike: bool
+
+
+class UserRatePostData(DataBaseModel):
+    user_id: uuid.UUID
     like: bool
     dislike: bool
 
 
 class PostsData(DataBaseModel):
     id: uuid.UUID
-    text: str = None
+    title: str
+    body: str
     owner_id: uuid.UUID
-    date_dispatch: datetime.date = None
-    time_dispatch: datetime.time = None
+    create_time: datetime.datetime
+    modify_time: datetime.datetime
+    users: List[UserRatePostData]
