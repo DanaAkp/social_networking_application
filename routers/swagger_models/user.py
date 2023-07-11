@@ -1,5 +1,6 @@
 import re
 import uuid
+from typing import Optional
 
 from pydantic import BaseModel, validator, Field
 from constants import len_of_full_user_name, len_of_user_name, min_len_of_password
@@ -30,5 +31,5 @@ class UserDataIn(BaseModel):
 class UserData(DataBaseModel):
     id: uuid.UUID
     name: str
-    full_name: str
+    full_name: Optional[str]
     email: str

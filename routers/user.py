@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
 from controllers import user_service as service
@@ -8,7 +8,7 @@ from routers.swagger_models.user import UserData, UserDataIn
 
 user_router = APIRouter(
     prefix="/users",
-    tags=["users"],
+    tags=["Users"],
     # dependencies=[Depends(get_token_header)],
     responses={
         200: {'description': 'Success'},
@@ -18,14 +18,7 @@ user_router = APIRouter(
 )
 
 
-@user_router.post(
-    "",
-    response_model=UserData,
-    responses={
-        200: {'description': 'Success'},
-        401: {'description': 'Unauthorized'},
-        404: {'description': 'Not found'},
-    })
+@user_router.post("", response_model=UserData)
 async def user_registration(user_data: UserDataIn):
     res = await service.registration(
         password=user_data.password, name=user_data.name, full_name=user_data.full_name,
@@ -41,7 +34,7 @@ async def get_user_by_id(user_id: str):
 
 
 @user_router.get("", response_model=List[UserData])
-async def search_user_by_name(user_name: str):
+async def get_all_users(user_name: Optional[str] = None):
     res = await service.get_item_by_name(user_name)
     return res
 
