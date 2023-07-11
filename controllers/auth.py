@@ -12,5 +12,5 @@ class AuthService:
         if token != "jessica":  # todo
             raise HTTPException(status_code=400, detail="No Jessica token provided")
 
-    async def login(self, login: str, password: str):  # todo return token
+    async def login(self, email: str, password: str):  # todo return token
         pass
