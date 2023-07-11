@@ -2,7 +2,6 @@ import uuid
 
 import sqlalchemy as db
 from models import metadata
-from models.role import roles
 
 users = db.Table(
     'users',

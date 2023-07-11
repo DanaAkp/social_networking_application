@@ -2,7 +2,6 @@ from fastapi import FastAPI
 
 from routers.user import user_router
 from routers.post import posts_router
-from routers.admin import admin_router
 from models import metadata, engine, connection
 
 app = FastAPI(title="SocialNetworkingApp")
