@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from controllers import message_service as service
+from controllers import post_service as service
 from routers.swagger_models.post import PostsData, PostsDataIn, RatePostsDataIn
 
 # from ..dependencies import get_token_header
