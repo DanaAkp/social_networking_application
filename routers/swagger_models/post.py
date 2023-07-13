@@ -1,6 +1,6 @@
 import datetime
 import uuid
-from typing import List
+from typing import Optional
 
 from routers.swagger_models import DataBaseModel
 
@@ -12,13 +12,6 @@ class PostsDataIn(DataBaseModel):
 
 class RatePostsDataIn(DataBaseModel):
     like: bool
-    dislike: bool
-
-
-class UserRatePostData(DataBaseModel):
-    user_id: uuid.UUID
-    like: bool
-    dislike: bool
 
 
 class PostsData(DataBaseModel):
@@ -28,7 +21,8 @@ class PostsData(DataBaseModel):
     owner_id: uuid.UUID
     create_time: datetime.datetime
     modify_time: Optional[datetime.datetime]
-    users: Optional[List[UserRatePostData]]
+    count_likes: Optional[int]
+    count_dislikes: Optional[int]
 
 
 class SuccessData(DataBaseModel):

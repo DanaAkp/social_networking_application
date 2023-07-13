@@ -49,7 +49,7 @@ async def rate_post(post_id: str, rate_data: RatePostsDataIn,
                     credentials: HTTPAuthorizationCredentials = auth_service.security):
     if (token := credentials.credentials) and (curr_user_id := await auth_service.get_current_user_id(token)):
         result = await service.rate_post(
-            like=rate_data.like, dislike=rate_data.dislike,
+            is_like=rate_data.like,
             post_id=post_id, user_id=curr_user_id
         )
         return result
