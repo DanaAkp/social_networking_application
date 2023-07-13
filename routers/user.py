@@ -6,9 +6,8 @@ from routers.swagger_models.user import UserData, UserDataIn
 from fastapi.security import HTTPAuthorizationCredentials
 
 user_router = APIRouter(
-    prefix="/users",
-    tags=["Users"],
-    # dependencies=[Depends(get_token_header)],
+    prefix='/users',
+    tags=['Users'],
     responses={
         200: {'description': 'Success'},
         401: {'description': 'Unauthorized'},
@@ -17,7 +16,7 @@ user_router = APIRouter(
 )
 
 
-@user_router.post("", response_model=UserData)
+@user_router.post('', response_model=UserData)
 async def user_registration(user_data: UserDataIn):
     res = await service.registration(
         password=user_data.password, name=user_data.name, full_name=user_data.full_name,

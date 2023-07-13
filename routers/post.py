@@ -7,16 +7,15 @@ from controllers import auth_service, post_service as service
 from routers.swagger_models.post import PostsData, PostsDataIn, RatePostsDataIn, SuccessData
 
 posts_router = APIRouter(
-    prefix="/posts",
-    tags=["Posts"],
-    # dependencies=[Depends(get_token_header)],
+    prefix='/posts',
+    tags=['Posts'],
     responses={
-        200: {"description": "Success"},
-        201: {"description": "Created"},
-        401: {"description": "Unauthorized"},
-        403: {"description": "Forbidden"},
-        400: {"description": "Bad request"},
-        404: {"description": "Not found"},
+        200: {'description': 'Success'},
+        201: {'description': 'Created'},
+        401: {'description': 'Unauthorized'},
+        403: {'description': 'Forbidden'},
+        400: {'description': 'Bad request'},
+        404: {'description': 'Not found'},
     },
 )
 

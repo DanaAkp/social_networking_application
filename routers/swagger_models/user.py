@@ -13,18 +13,18 @@ class UserDataIn(BaseModel):
     email: str
     password: str = Field(min_length=min_len_of_password)
 
-    @validator("email")
+    @validator('email')
     def check_email(cls, v):
         pattern = r'([A-Za-z0-9]+[.-_])*[A-Za-z0-9]+@[A-Za-z0-9-]+(\.[A-Z|a-z]{2,})+'
         if not re.search(pattern, v):
-            raise ValueError("Invalid email.")
+            raise ValueError('Invalid email.')
         return v
 
-    @validator("password")
+    @validator('password')
     def check_password(cls, v):
-        pattern = r"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$"
+        pattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$'
         if not re.search(pattern, v):
-            raise ValueError("Weak password.")
+            raise ValueError('Weak password.')
         return v
 
 
