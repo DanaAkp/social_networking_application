@@ -1,7 +1,9 @@
-from controllers.auth import AuthService
 from controllers.post import PostService
-from controllers.user import UserService
+from controllers.auth import AuthService
 
-auth_service = AuthService()
 post_service = PostService()
+auth_service = AuthService()
+
+from controllers.user import UserService  # noqa circular import
+
 user_service = UserService()

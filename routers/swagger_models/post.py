@@ -27,5 +27,9 @@ class PostsData(DataBaseModel):
     body: str
     owner_id: uuid.UUID
     create_time: datetime.datetime
-    modify_time: datetime.datetime
-    users: List[UserRatePostData]
+    modify_time: Optional[datetime.datetime]
+    users: Optional[List[UserRatePostData]]
+
+
+class SuccessData(DataBaseModel):
+    success: str
