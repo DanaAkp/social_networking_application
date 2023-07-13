@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from routers.user import user_router
 from routers.auth import login_router
 from routers.post import posts_router
-from models import metadata, engine, session, connection
+from models import metadata, engine, session
 
 app = FastAPI(title='SocialNetworkingApp')
 metadata.create_all(engine)
@@ -11,7 +11,6 @@ metadata.create_all(engine)
 
 @app.on_event('shutdown')
 async def shutdown():
-    connection.close()
     session.close()
 
 
