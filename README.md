@@ -19,4 +19,12 @@ Backend приложения "SocialNetworkingApp"
    docker compose up -d
    ```
 5. В браузере открыть страницу http://localhost:8080/docs с документацией в формате OpenAPI.
+6. После запуска создается пользователь по умолчанию со
+   следующими входными данными:
+    ```
+    {
+        "email": "default@default.com",
+        "password": "default_password"
+    }
+    ```
 
