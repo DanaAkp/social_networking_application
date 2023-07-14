@@ -1,6 +1,6 @@
 version: '3.9'
 services:
-  postgres-db:
+  db:
     image: postgres:14
     restart: unless-stopped
     healthcheck:
@@ -15,10 +15,16 @@ services:
   api:
     build: .
     user: 1000:1000
+    restart: unless-stopped
     env_file:
-      - ./local.env
+      - .env
     ports:
-      - "8001:80"
+      - "8080:80"
     depends_on:
-      postgres-db:
+      db:
         condition: service_healthy
+    volumes:
+      - social_networking_data:/var/lib/postgresql/data
+
+volumes:
+  social_networking_data:
