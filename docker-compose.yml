@@ -1,0 +1,24 @@
+version: '3.9'
+services:
+  postgres-db:
+    image: postgres:14
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER_NAME}
+      POSTGRES_PASSWORD: ${DB_USER_PASSWORD}
+  api:
+    build: .
+    user: 1000:1000
+    env_file:
+      - ./local.env
+    ports:
+      - "8001:80"
+    depends_on:
+      postgres-db:
+        condition: service_healthy
