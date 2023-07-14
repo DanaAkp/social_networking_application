@@ -1,8 +1,8 @@
 from typing import List, Optional
 
 from fastapi import APIRouter, HTTPException
-from controllers import auth_service, user_service as service
-from routers.swagger_models.user import UserData, UserDataIn
+from app.controllers import auth_service, user_service as service
+from app.routers.swagger_models.user import UserData, UserDataIn
 from fastapi.security import HTTPAuthorizationCredentials
 
 user_router = APIRouter(

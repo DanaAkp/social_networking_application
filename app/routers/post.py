@@ -3,8 +3,8 @@ from typing import List
 from fastapi import APIRouter
 from fastapi.security import HTTPAuthorizationCredentials
 
-from controllers import auth_service, post_service as service
-from routers.swagger_models.post import PostsData, PostsDataIn, RatePostsDataIn, SuccessData
+from app.controllers import auth_service, post_service as service
+from app.routers.swagger_models.post import PostsData, PostsDataIn, RatePostsDataIn, SuccessData
 
 posts_router = APIRouter(
     prefix='/posts',

@@ -2,7 +2,7 @@ import datetime
 import uuid
 from typing import Optional
 
-from routers.swagger_models import DataBaseModel
+from app.routers.swagger_models import DataBaseModel
 
 
 class PostsDataIn(DataBaseModel):

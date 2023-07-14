@@ -3,7 +3,7 @@ from datetime import datetime
 
 import sqlalchemy as db
 
-from models import metadata, Base
+from app.models import metadata, Base
 
 
 class RatePosts(Base):

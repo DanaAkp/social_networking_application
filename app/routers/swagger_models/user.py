@@ -3,8 +3,8 @@ import uuid
 from typing import Optional
 
 from pydantic import BaseModel, validator, Field
-from constants import len_of_full_user_name, len_of_user_name, min_len_of_password
-from routers.swagger_models import DataBaseModel
+from app.constants import len_of_full_user_name, len_of_user_name, min_len_of_password
+from app.routers.swagger_models import DataBaseModel
 
 
 class UserDataIn(BaseModel):

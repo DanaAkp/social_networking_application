@@ -4,9 +4,9 @@ import traceback
 from fastapi import HTTPException
 from typing import List
 
-from models import session
-from models.user import User
-from controllers import auth_service
+from app.models import session
+from app.models.user import User
+from app.controllers import auth_service
 
 
 class UserService:

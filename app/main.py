@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 
-from routers.user import user_router
-from routers.auth import login_router
-from routers.post import posts_router
-from models import metadata, engine, session
+from app.routers.user import user_router
+from app.routers.auth import login_router
+from app.routers.post import posts_router
+from app.models import metadata, engine, session
 
 app = FastAPI(title='SocialNetworkingApp')
 metadata.create_all(engine)

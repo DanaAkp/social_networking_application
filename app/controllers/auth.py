@@ -8,9 +8,9 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, Security
 
-from models import session
-from models.user import User
-import config
+from app.models import session
+from app.models.user import User
+from app import config
 
 
 class AuthService:

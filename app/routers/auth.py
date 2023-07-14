@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from controllers import auth_service
-from routers.swagger_models.auth import LoginDataIn, LoginData
+from app.controllers import auth_service
+from app.routers.swagger_models.auth import LoginDataIn, LoginData
 
 login_router = APIRouter(
     prefix='/auth',

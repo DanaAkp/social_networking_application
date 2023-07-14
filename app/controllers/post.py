@@ -7,8 +7,8 @@ from typing import List
 from sqlalchemy import or_, func
 from fastapi import HTTPException
 
-from models import session
-from models.post import Post, RatePosts
+from app.models import session
+from app.models.post import Post, RatePosts
 
 
 class PostService:
