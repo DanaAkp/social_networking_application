@@ -8,9 +8,9 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, Security
 
-from app.models import session
-from app.models.user import User
 from app import config
+from app.models import repo
+from app.models.user import User
 
 
 class AuthService:
@@ -36,7 +36,8 @@ class AuthService:
         return self.pwd_context.verify(plain_password, hashed_password)
 
     async def login(self, email: str, password: str) -> dict:
-        user = session.query(User).filter(User.email == email).one_or_none()
+        query = await repo.get_filter_query(User, (User.email == email,))
+        user = await repo.get_one_or_none_by_query(query)
         if not (user and await self.verify_password(password, user.password)):
             raise HTTPException(400, self.INVALID_LOGIN_DATA)
 

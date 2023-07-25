@@ -7,8 +7,19 @@ from typing import List
 from sqlalchemy import or_, func
 from fastapi import HTTPException
 
-from app.models import session
+from app.models import repo
 from app.models.post import Post, RatePosts
+
+repo.get_post_query = lambda: repo.session.query(
+    Post.id.label('id'),
+    Post.body.label('body'),
+    Post.title.label('title'),
+    Post.owner_id.label('owner_id'),
+    Post.create_time.label('create_time'),
+    Post.modify_time.label('modify_time'),
+    func.count(RatePosts.user_id).filter(RatePosts.is_like.is_(True)).label('count_likes'),
+    func.count(RatePosts.user_id).filter(RatePosts.is_like.is_(False)).label('count_dislikes'),
+).select_from(Post).outerjoin(RatePosts, Post.id == RatePosts.post_id).group_by(Post)
 
 
 class PostService:
@@ -22,92 +33,85 @@ class PostService:
     FORBIDDEN_UPDATE = 'Only post owner can update it.'
 
     async def send_post(self, body: str, owner_id: str, title) -> Post:
-        new_post = Post(
-            body=body, owner_id=uuid.UUID(owner_id), title=title,
-            create_time=datetime.datetime.utcnow()
-        )
+
         try:
-            session.add(new_post)
-            session.commit()
+            new_post = await repo.create_instance(
+                model=Post,
+                commit=True,
+                body=body, owner_id=uuid.UUID(owner_id), title=title,
+                create_time=datetime.datetime.utcnow()
+            )
         except Exception as error:
-            session.rollback()
+            await repo.rollback()
             logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
             raise HTTPException(400, self.ERROR_CREATE)
         return new_post
 
-    def get_query(self):
-        return session.query(
-            Post.id,
-            Post.body,
-            Post.title,
-            Post.owner_id,
-            Post.create_time,
-            Post.modify_time,
-            func.count(RatePosts.user_id).filter(RatePosts.is_like.is_(True)).label('count_likes'),
-            func.count(RatePosts.user_id).filter(RatePosts.is_like.is_(False)).label('count_dislikes'),
-        ).outerjoin(RatePosts, Post.id == RatePosts.post_id).group_by(Post)
-
     async def get_post_by_id(self, post_id: str) -> Post:
-        if post := self.get_query().filter(Post.id == post_id).one_or_none():
+        if post := await repo.get_item_by_id(Post, post_id, repo.get_post_query()):
             return post
         raise HTTPException(404, self.NOT_FOUND_ERROR.format(post_id))
 
     async def rate_post(self, is_like: bool, post_id: str, user_id: str) -> dict:
-        if not (post := session.query(Post).filter(Post.id == post_id).one_or_none()):
+        if not (post := await repo.get_item_by_id(Post, post_id)):
             raise HTTPException(404, self.NOT_FOUND_ERROR.format(post_id))
         if post.owner_id == uuid.UUID(user_id):
             raise HTTPException(403, self.FORBIDDEN_RATE_POST)
 
         try:
-            if rate_post_users := session.query(RatePosts).filter(RatePosts.post_id == post_id,
-                                                                  RatePosts.user_id == user_id).one_or_none():
+            query = await repo.get_filter_query(RatePosts, (RatePosts.post_id == post_id,
+                                                            RatePosts.user_id == user_id))
+            if rate_post_users := await repo.get_one_or_none_by_query(query):
                 if rate_post_users.is_like == is_like:
-                    session.delete(rate_post_users)
+                    await repo.delete_instance(rate_post_users)
             else:
-                rate_post_users = RatePosts(post_id=post_id, user_id=user_id)
-                session.add(rate_post_users)
+                rate_post_users = await repo.create_instance(RatePosts, commit=False, post_id=post_id, user_id=user_id)
             rate_post_users.is_like = is_like
-            session.commit()
+            await repo.commit()
             return {'success': 'True'}
         except Exception as error:
-            session.rollback()
+            await repo.rollback()
             logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
             raise HTTPException(400, self.ERROR_RATE)
 
     async def get_all_posts(self, user_id: str, search_text: str = None) -> List[Post]:
-        query = self.get_query().filter(Post.owner_id == user_id)
+        query = await repo.get_filter_query(Post, (Post.owner_id == user_id,), repo.get_post_query())
         if search_text:
-            query = query.filter(or_(Post.body.ilike(f'%{search_text}%'), Post.title.ilike(f'%{search_text}%')))
-        return query.all()
+            query = await repo.get_filter_query(
+                Post,
+                (or_(Post.body.ilike(f'%{search_text}%'), Post.title.ilike(f'%{search_text}%')),)
+            )
+        return await repo.get_all_by_query(Post, query)
 
     async def edit_post(self, post_id: str, user_id: str, body, title) -> Post:
-        if not (post := session.query(Post).filter(Post.id == post_id).one_or_none()):
+        if not (post := await repo.get_item_by_id(Post, post_id), repo.get_post_query()):
             raise HTTPException(404, self.NOT_FOUND_ERROR)
         try:
             if post.owner_id == uuid.UUID(user_id):
                 post.body = body
                 post.title = title
                 post.modify_time = datetime.datetime.utcnow()
-                session.commit()
+                await repo.commit()
                 return post
         except Exception as error:
-            session.rollback()
+            await repo.rollback()
             logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
             raise HTTPException(400, self.ERROR_UPDATE)
         raise HTTPException(403, self.FORBIDDEN_UPDATE)
 
     async def delete_post(self, post_id: str, owner_id: str) -> dict:
-        post = session.query(Post).filter(Post.id == post_id).one_or_none()
+        post = await repo.get_item_by_id(Post, post_id)
         if not post:
             raise HTTPException(404, self.NOT_FOUND_ERROR.format(post_id))
         if post.owner_id == owner_id:
             raise HTTPException(403, self.FORBIDDEN_DELETE_POST)
         try:
-            session.query(RatePosts).filter(RatePosts.post_id == post_id).delete()
-            session.delete(post)
-            session.commit()
-            return {'success': True}
+            query = await repo.get_filter_query(RatePosts, (RatePosts.post_id == post_id,))
+            await repo.delete_by_query(query)
+            await repo.delete_instance(post)
         except Exception as error:
-            session.rollback()
+            await repo.rollback()
             logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
             raise HTTPException(400, self.ERROR_DELETE)
+        await repo.commit()
+        return {'success': True}
