@@ -6,7 +6,7 @@ from typing import List
 
 from app.models import session
 from app.models.user import User
-from app.controllers import auth_service
+from app.controllers.auth import AuthService
 
 
 class UserService:
@@ -15,8 +15,11 @@ class UserService:
     ERROR_UPDATE = 'Error with updating user.'
     ERROR_NOT_FOUND = 'Not found user by id {}.'
 
+    def __init__(self, auth_service: AuthService):
+        self.auth_service = auth_service
+
     async def registration(self, name: str, password: str, full_name: str, email: str) -> User:
-        password = await auth_service.get_password_hash(password)
+        password = await self.auth_service.get_password_hash(password)
         new_user = User(
             name=name, password=password, full_name=full_name, email=email
         )
@@ -51,7 +54,7 @@ class UserService:
                 user.name = name
                 user.full_name = full_name
                 user.email = email
-                user.password = await auth_service.get_password_hash(password)
+                user.password = await self.auth_service.get_password_hash(password)
                 session.commit()
                 return user
         except Exception as error:

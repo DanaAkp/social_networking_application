@@ -1,5 +1,7 @@
-from fastapi import APIRouter
-from app.controllers import auth_service
+from fastapi import APIRouter, Depends
+from dependency_injector.wiring import Provide, inject
+
+from app.dependencies import Container
 from app.routers.swagger_models.auth import LoginDataIn, LoginData
 
 login_router = APIRouter(
@@ -13,12 +15,15 @@ login_router = APIRouter(
 
 
 @login_router.post('/login', response_model=LoginData)
-async def login_user(login_data: LoginDataIn):
+@inject
+async def login_user(login_data: LoginDataIn, auth_service=Depends(Provide[Container.auth_service])):
     result = await auth_service.login(login_data.email, login_data.password)
     return result
 
 
 @login_router.get('/refresh_token')
-async def get_access_token_by_refresh_token(refresh_token: str) -> LoginData:
+@inject
+async def get_access_token_by_refresh_token(refresh_token: str,
+                                            auth_service=Depends(Provide[Container.auth_service])) -> LoginData:
     result = await auth_service.refresh(refresh_token)
     return result

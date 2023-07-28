@@ -3,10 +3,9 @@ from datetime import timedelta, datetime
 from typing import Union
 
 from fastapi.security import OAuth2PasswordBearer
-from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from fastapi import HTTPException, Security
+from fastapi import HTTPException
 
 from app.models import session
 from app.models.user import User
@@ -27,7 +26,6 @@ class AuthService:
 
     pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
-    security = Security(HTTPBearer())
 
     async def get_password_hash(self, password: str) -> str:
         return self.pwd_context.hash(password)
