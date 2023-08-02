@@ -1,11 +1,9 @@
 import asyncio
-import unittest
 
 import pytest
 
 import sqlalchemy as db
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import sessionmaker
 
 from app.main import app
 from app.models import metadata
@@ -14,7 +12,6 @@ from app.models.user import User
 from app.controllers import AuthService, UserService, PostService
 
 url = "sqlite:///:memory:"
-# url = 'postgresql://postgres:postgres@localhost:5433'
 
 user_json = {
     "id": "",
@@ -22,11 +19,6 @@ user_json = {
     "full_name": "Akpaeva Danagul",
     "email": "kwndke@md.fd",
     "password": "Password!2"
-}
-
-TOKENS = {
-    "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTY5NTQ4MzEtOTRjYi00ZjVkLTkwY2MtYTg3NGQxZWE3YWFiIiwic2NvcGUiOiJhY2Nlc3NfdG9rZW4iLCJleHAiOjE2OTAzMDYwOTh9.8OGBAnzW6VesUgIRuvnGKE2E4XwbT2-WMTxhgn9sRoE",
-    "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZTY5NTQ4MzEtOTRjYi00ZjVkLTkwY2MtYTg3NGQxZWE3YWFiIiwic2NvcGUiOiJyZWZyZXNoX3Rva2VuIiwiZXhwIjoxNjkwMzE1MDk4fQ.RBwowpNteV0zOYSQ7QJ9MujiA0xjM3mvRgiU0R4z2Qw"
 }
 
 
