@@ -6,8 +6,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException
+from sqlalchemy.orm import Session
 
-from app.models import session
 from app.models.user import User
 from app import config
 
@@ -27,6 +27,9 @@ class AuthService:
     pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
     oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
+    def __init__(self, session: Session):
+        self.session = session
+
     async def get_password_hash(self, password: str) -> str:
         return self.pwd_context.hash(password)
 
@@ -34,7 +37,7 @@ class AuthService:
         return self.pwd_context.verify(plain_password, hashed_password)
 
     async def login(self, email: str, password: str) -> dict:
-        user = session.query(User).filter(User.email == email).one_or_none()
+        user = self.session.query(User).filter(User.email == email).one_or_none()
         if not (user and await self.verify_password(password, user.password)):
             raise HTTPException(400, self.INVALID_LOGIN_DATA)
 

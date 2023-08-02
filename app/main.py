@@ -4,7 +4,7 @@ from app.dependencies import container
 from app.routers.user import user_router
 from app.routers.auth import login_router
 from app.routers.post import posts_router
-from app.models import metadata, engine
+from app.models import metadata, engine, session
 
 app = FastAPI(title='SocialNetworkingApp')
 metadata.create_all(engine)
@@ -12,6 +12,7 @@ metadata.create_all(engine)
 from app import routers, app_events, controllers  # noqa
 
 container.wire(modules=[routers, app_events, controllers])
+container.config.session.from_value(session)
 app.container = container
 
 app.include_router(user_router)
