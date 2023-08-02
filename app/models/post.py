@@ -17,9 +17,9 @@ class RatePosts(Base):
 class Post(Base):
     __tablename__ = 'posts'
     metadata = metadata
-    id = db.Column(db.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = db.Column(db.Uuid, primary_key=True, default=uuid.uuid4)
     title = db.Column(db.String, nullable=False)
     body = db.Column(db.String, nullable=False)
-    owner_id = db.Column(db.UUID(as_uuid=True), db.ForeignKey('users.id'), nullable=False)
+    owner_id = db.Column(db.Uuid, db.ForeignKey('users.id'), nullable=False)
     create_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     modify_time = db.Column(db.DateTime)
