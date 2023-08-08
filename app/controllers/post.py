@@ -9,6 +9,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.post import Post, RatePosts
+from app.controllers.notification import NotificationService
 
 
 class PostService:
@@ -21,8 +22,9 @@ class PostService:
     FORBIDDEN_DELETE_POST = 'Only post owner can delete it.'
     FORBIDDEN_UPDATE = 'Only post owner can update it.'
 
-    def __init__(self, session: Session):
+    def __init__(self, session: Session, notification_service: NotificationService):
         self.session = session
+        self.notification_service = notification_service
 
     async def send_post(self, body: str, owner_id: str, title) -> Post:
         new_post = Post(
@@ -36,6 +38,8 @@ class PostService:
             self.session.rollback()
             logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
             raise HTTPException(400, self.ERROR_CREATE)
+
+        await self.notification_service.send_notification_about_new_post(new_post)
         return new_post
 
     def get_query(self):

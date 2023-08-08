@@ -2,11 +2,12 @@ import logging
 import traceback
 
 from fastapi import HTTPException
+from fastapi_socketio import SocketManager
 from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
-from app.models.user import User
+from app.models.user import User, Follower
 from app.controllers.auth import AuthService
 
 
@@ -14,11 +15,15 @@ class UserService:
     FORBIDDEN_UPDATE = 'User can updating only self account.'
     ERROR_CREATE = 'Error with creating new user.'
     ERROR_UPDATE = 'Error with updating user.'
+    ERROR_SUBSCRIBE_IN_DB = 'Unable to follow/unfollow this user.'
+    ERROR_EXIST_SUBSCRIBE = "You already have a subscription to this user."
+    ERROR_NOT_FOUND_SUBSCRIBE = "Not found subscription for this user."
     ERROR_NOT_FOUND = 'Not found user by id {}.'
 
-    def __init__(self, auth_service: AuthService, session: Session):
+    def __init__(self, auth_service: AuthService, session: Session, socket_manager: SocketManager):
         self.auth_service = auth_service
         self.session = session
+        self.socket_manager = socket_manager
 
     async def registration(self, name: str, password: str, full_name: str, email: str) -> User:
         password = await self.auth_service.get_password_hash(password)
@@ -64,3 +69,31 @@ class UserService:
             logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
             raise HTTPException(400, self.ERROR_UPDATE)
         raise HTTPException(404, self.ERROR_NOT_FOUND.format(user_id))
+
+    async def subscribe_for_user(self, subscriber_id: str, subscription_id: str) -> dict:
+        if self.session.query(Follower).filter(Follower.subscriber_id == subscriber_id,
+                                               Follower.subscription_id == subscription_id).one_or_none():
+            raise HTTPException(400, self.ERROR_EXIST_SUBSCRIBE)
+        try:
+            follower = Follower(subscriber_id=subscriber_id, subscription_id=subscription_id)
+            self.session.add(follower)
+            self.session.commit()
+            return {'success': True}
+        except Exception as error:
+            self.session.rollback()
+            logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
+            raise HTTPException(400, self.ERROR_SUBSCRIBE_IN_DB)
+
+    async def unsubscribe_user(self, subscriber_id: str, subscription_id: str) -> dict:
+        if not (follower := self.session.query(Follower)
+                .filter(Follower.subscriber_id == subscriber_id,
+                        Follower.subscription_id == subscription_id).one_or_none()):
+            raise HTTPException(404, self.ERROR_NOT_FOUND_SUBSCRIBE)
+        try:
+            self.session.delete(follower)
+            self.session.commit()
+            return {'success': True}
+        except Exception as error:
+            self.session.rollback()
+            logging.error(f'Error: {error}, traceback: {traceback.format_exc()}')
+            raise HTTPException(400, self.ERROR_SUBSCRIBE_IN_DB)

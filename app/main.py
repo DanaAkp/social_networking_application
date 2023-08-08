@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi_socketio import SocketManager
 
 from app.dependencies import container
 from app.routers.user import user_router
@@ -11,9 +12,11 @@ metadata.create_all(engine)
 
 from app import routers, app_events, controllers  # noqa
 
-container.wire(modules=[routers, app_events, controllers])
+s_m = SocketManager(app)
 container.config.session.from_value(session)
-app.container = container
+container.config.socket_manager.from_value(s_m)
+
+container.wire(modules=[routers, app_events, controllers])
 
 app.include_router(user_router)
 app.include_router(login_router)
